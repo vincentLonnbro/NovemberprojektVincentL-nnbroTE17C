@@ -34,7 +34,8 @@ namespace NovemberprojektVincentLönnbroTE17C
     {
 
         Skepp skepp = new Skepp();
-
+        public static List<int> xCord = new List<int>();
+        public static List<int> yCord = new List<int>();
 
         static int size = 12;
 
@@ -46,20 +47,18 @@ namespace NovemberprojektVincentLönnbroTE17C
 
             List<string> test = new List<string>();
 
-
-
             Dictionary<int, Dictionary<int, string>> testDic = new Dictionary<int, Dictionary<int, string>>();
-
-            //testDic.Add(0, "   A B C D E F G H I J");
 
             Dictionary<int, string> dic = new Dictionary<int, string>();
 
             Dictionary<int, string> dicO = new Dictionary<int, string>();
 
+            Dictionary<List<int>, List<int>> cords = new Dictionary<List<int>, List<int>>();
 
-            Dictionary<int, Dictionary<int, int>> cords = new Dictionary<int, Dictionary<int, int>>();
+            int skeppLängd = int.Parse(Console.ReadLine());
+            AddCords(skeppLängd);
 
-            ShipPutter(testDic, dicO = DefaultMap(dicO), cords = AddCords(cords), dic);
+            ShipPutter(testDic, dicO = DefaultMap(dicO), dic);
 
             test2(testDic);
             //TestTest(dic, testDic);
@@ -68,7 +67,7 @@ namespace NovemberprojektVincentLönnbroTE17C
 
         }
 
-        static Dictionary<int, int> AddCords(Dictionary<int, Dictionary<int, int>> cords, int skäppLängd)
+        static void AddCords(int skeppLängd)
         {
             Console.WriteLine("Skriv in kordinater för ditt skepp, börja med z, sen y.");
 
@@ -76,24 +75,68 @@ namespace NovemberprojektVincentLönnbroTE17C
 
             Console.WriteLine("X = ");
 
-            int xC = int.Parse(Console.ReadLine());
+            xCord.Add(int.Parse(Console.ReadLine()));
+            int xC = xCord[0];
             Console.WriteLine("Y = ");
-            int yC = int.Parse(Console.ReadLine());
+            yCord.Add(int.Parse(Console.ReadLine()));
+            int yC = yCord[0];
 
-
-            Console.WriteLine("Vilket håll är båten riktad?");
+            Console.WriteLine("Vilket håll är skäppet riktat?");
             var dir = Console.ReadKey();
-
+            Console.WriteLine();
             if (dir.Key == ConsoleKey.UpArrow)
             {
-                for (int i = 0; i < length; i++)
+                for (int i = 0; i < skeppLängd; i++)
+                {
+                    xCord.Add(xC);
+                    yCord.Add(yC - i);
+                }
+
+            }
+
+            else if (dir.Key == ConsoleKey.RightArrow)
+            {
+                for (int i = 0; i < skeppLängd; i++)
+                {
+                    xCord.Add(xC + i);
+                    yCord.Add(yC);
+                }
+            }
+        }
+
+        bool LengthCheck(ConsoleKeyInfo dir, int skeppLängd)
+        {
+            if (dir.Key == ConsoleKey.UpArrow)
+            {
+                if (yCord[0] - skeppLängd < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else if (dir.Key == ConsoleKey.DownArrow)
+            {
+                if (yCord[0] + skeppLängd > size)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else if (dir.Key == ConsoleKey.LeftArrow)
+            {
+                if (xCord[0] - skeppLängd < 0)
                 {
 
                 }
-                cords.Add(xC, yC - 1);
             }
 
-            return cords;
+
         }
 
         static Dictionary<int, string> DefaultMap(Dictionary<int, string> defDic)
@@ -106,14 +149,14 @@ namespace NovemberprojektVincentLönnbroTE17C
             return defDic;
         }
 
-        static Dictionary<int, Dictionary<int, string>> ShipPutter(Dictionary<int, Dictionary<int, string>> fullDic, Dictionary<int, string> dicO, Dictionary<int, Dictionary<int, int>> cords, Dictionary<int, string> dic)
+        static Dictionary<int, Dictionary<int, string>> ShipPutter(Dictionary<int, Dictionary<int, string>> fullDic, Dictionary<int, string> dicO, Dictionary<int, string> dic)
         {
             for (int i = 0; i < dicO.Count; i++)
             {
 
                 for (int j = 0; j < dicO.Count; j++)
                 {
-                    if (cords.ContainsKey(j + 1))
+                    if (xCord.Contains(j + 1))
                     {
                         dic[j + 1] = Skepp.Skepp1;
                     }
@@ -123,7 +166,7 @@ namespace NovemberprojektVincentLönnbroTE17C
                     }
 
                 }
-                if (cords.ContainsValue(i + 1))
+                if (yCord.Contains(i + 1))
                 {
                     fullDic[i] = dic;
                 }
