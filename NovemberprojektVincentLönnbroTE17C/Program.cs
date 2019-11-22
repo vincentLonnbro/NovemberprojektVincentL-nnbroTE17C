@@ -14,7 +14,7 @@ namespace NovemberprojektVincentLönnbroTE17C
      *      Placera ett skepp i taget, storleksordning minsta först. Uppdatera spelplanen efter ett skepp har placerats ut. 
      *      
      * 
-     * 
+     *      Göra så att det finns en int som håller koll på vilket skepp man håller på att välja cords för så att man därefter kan lägga in en lista med de cordsen i en dictionary
      * 
      * 
      * 
@@ -34,14 +34,17 @@ namespace NovemberprojektVincentLönnbroTE17C
     {
 
         Skepp skepp = new Skepp();
-        public static List<int> xCord = new List<int>();
-        public static List<int> yCord = new List<int>();
 
-        static int size = 12;
+        public static Dictionary<int, List<int>> xCordAll = new Dictionary<int, List<int>>();
+        public static Dictionary<int, List<int>> yCordAll = new Dictionary<int, List<int>>();
+
+        static int size = 8;
 
         public string y = "";
         static void Main(string[] args)
         {
+
+
             SpelPlan map1 = new SpelPlan();
             //Console.WriteLine(map1.spelplan);
 
@@ -56,11 +59,17 @@ namespace NovemberprojektVincentLönnbroTE17C
             Dictionary<List<int>, List<int>> cords = new Dictionary<List<int>, List<int>>();
 
             int skeppLängd = int.Parse(Console.ReadLine());
-            AddCords(skeppLängd);
 
-            ShipPutter(testDic, dicO = DefaultMap(dicO), dic);
+            dicO = DefaultMap(dicO);
 
-            test2(testDic);
+            for (int i = 0; i < 5; i++)
+            {
+                AddCords(skeppLängd);
+
+                ShipPutter(testDic, dicO, dic);
+
+                test2(testDic);
+            }
             //TestTest(dic, testDic);
 
             Console.ReadKey();
@@ -69,6 +78,8 @@ namespace NovemberprojektVincentLönnbroTE17C
 
         static void AddCords(int skeppLängd)
         {
+            List<int> yCord = new List<int>();
+            List<int> xCord = new List<int>();
             Console.WriteLine("Skriv in kordinater för ditt skepp, börja med z, sen y.");
 
             Dictionary<int, int> cords1 = new Dictionary<int, int>();
@@ -80,35 +91,82 @@ namespace NovemberprojektVincentLönnbroTE17C
             Console.WriteLine("Y = ");
             yCord.Add(int.Parse(Console.ReadLine()));
             int yC = yCord[0];
+            
+            bool succes = false;
+            
+            Console.WriteLine("Vilket håll är skäppet riktat?\nAnvänd piltangenterna för att välja riktning!");
 
-            Console.WriteLine("Vilket håll är skäppet riktat?");
             var dir = Console.ReadKey();
+            while (succes == false)
+            {
+            
+                
+                if (dir.Key == ConsoleKey.UpArrow || dir.Key == ConsoleKey.DownArrow || dir.Key == ConsoleKey.LeftArrow || dir.Key == ConsoleKey.RightArrow)
+                {
+                    if (LengthCheck(dir, skeppLängd, xC, yC) == true)           // denna if satsen ligger här och inte i den ovan då jag vill kunna vara mer specifik om vad som var fel
+                    {
+                        if (dir.Key == ConsoleKey.UpArrow)
+                        {
+                            for (int i = 1; i < skeppLängd; i++)
+                            {
+                                yCord.Add(yC - i);
+                            }
+
+                        }
+
+                        else if (dir.Key == ConsoleKey.RightArrow)
+                        {
+                            for (int i = 1; i < skeppLängd; i++)
+                            {
+                                xCord.Add(xC + i);
+                            }
+                        }
+                        else if (dir.Key == ConsoleKey.DownArrow)
+                        {
+                            for (int i = 0; i < skeppLängd; i++)
+                            {
+                                yCord.Add(yC + i);
+                            }
+                        }
+                        else if (dir.Key == ConsoleKey.LeftArrow)
+                        {
+                            for (int i = 1; i < skeppLängd; i++)
+                            {
+                                xCord.Add(xC - i);
+                            }
+                        }
+                        succes = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Skeppet åkte utanför spelplanen, välj en annan riktning!");
+                        Console.WriteLine("Vilket håll är skäppet riktat?\nAnvänd piltangenterna för att välja riktning!");
+                        dir = Console.ReadKey();
+                    }
+                }
+                else
+                {
+
+                    Console.WriteLine("Skriv rätt >:(");
+                    Console.ReadLine();
+                    Console.WriteLine("Vilket håll är skäppet riktat?\nAnvänd piltangenterna för att välja riktning!");
+                    dir = Console.ReadKey();
+
+                }
+            }
+
+            xCordAll.Add(1, xCord);
+            yCordAll.Add(1, yCord);
             Console.WriteLine();
-            if (dir.Key == ConsoleKey.UpArrow)
-            {
-                for (int i = 0; i < skeppLängd; i++)
-                {
-                    xCord.Add(xC);
-                    yCord.Add(yC - i);
-                }
-
-            }
-
-            else if (dir.Key == ConsoleKey.RightArrow)
-            {
-                for (int i = 0; i < skeppLängd; i++)
-                {
-                    xCord.Add(xC + i);
-                    yCord.Add(yC);
-                }
-            }
+            
+            
         }
 
-        bool LengthCheck(ConsoleKeyInfo dir, int skeppLängd)
+        static bool LengthCheck(ConsoleKeyInfo dir, int skeppLängd, int xC, int yC)
         {
             if (dir.Key == ConsoleKey.UpArrow)
             {
-                if (yCord[0] - skeppLängd < 0)
+                if (yC - skeppLängd < 0)
                 {
                     return false;
                 }
@@ -119,7 +177,7 @@ namespace NovemberprojektVincentLönnbroTE17C
             }
             else if (dir.Key == ConsoleKey.DownArrow)
             {
-                if (yCord[0] + skeppLängd > size)
+                if (yC + skeppLängd > size)
                 {
                     return false;
                 }
@@ -130,9 +188,24 @@ namespace NovemberprojektVincentLönnbroTE17C
             }
             else if (dir.Key == ConsoleKey.LeftArrow)
             {
-                if (xCord[0] - skeppLängd < 0)
+                if (xC - skeppLängd < 0)
                 {
-
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else 
+            {
+                if (xC + skeppLängd < 0)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
                 }
             }
 
@@ -156,7 +229,7 @@ namespace NovemberprojektVincentLönnbroTE17C
 
                 for (int j = 0; j < dicO.Count; j++)
                 {
-                    if (xCord.Contains(j + 1))
+                    if (xCordAll[1].Contains(j))
                     {
                         dic[j + 1] = Skepp.Skepp1;
                     }
@@ -166,7 +239,7 @@ namespace NovemberprojektVincentLönnbroTE17C
                     }
 
                 }
-                if (yCord.Contains(i + 1))
+                if (yCordAll[1].Contains(i + 1))
                 {
                     fullDic[i] = dic;
                 }
