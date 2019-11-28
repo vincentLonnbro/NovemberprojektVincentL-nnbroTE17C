@@ -60,13 +60,20 @@ namespace NovemberprojektVincentLönnbroTE17C
 
             int skeppLängd = int.Parse(Console.ReadLine());
 
+            List<int> nullCords = new List<int>(); 
+
             dicO = DefaultMap(dicO);
+            xCordAll.Add(0, nullCords);
+            yCordAll.Add(0, nullCords);
+
+
+            testDic = DefaultMap1(testDic, dicO);
 
             for (int i = 0; i < 5; i++)
             {
-                AddCords(skeppLängd);
+                AddCords(skeppLängd, i + 1);
 
-                ShipPutter(testDic, dicO, dic);
+                ShipPutter(testDic, dicO, dic, i + 1);
 
                 test2(testDic);
             }
@@ -76,7 +83,7 @@ namespace NovemberprojektVincentLönnbroTE17C
 
         }
 
-        static void AddCords(int skeppLängd)
+        static void AddCords(int skeppLängd, int skeppNr)
         {
             List<int> yCord = new List<int>();
             List<int> xCord = new List<int>();
@@ -86,21 +93,19 @@ namespace NovemberprojektVincentLönnbroTE17C
 
             Console.WriteLine("X = ");
 
-            xCord.Add(int.Parse(Console.ReadLine()));
+            xCord.Add(int.Parse(Console.ReadLine()) - 1);
             int xC = xCord[0];
             Console.WriteLine("Y = ");
             yCord.Add(int.Parse(Console.ReadLine()));
             int yC = yCord[0];
-            
+
             bool succes = false;
-            
+
             Console.WriteLine("Vilket håll är skäppet riktat?\nAnvänd piltangenterna för att välja riktning!");
 
             var dir = Console.ReadKey();
             while (succes == false)
             {
-            
-                
                 if (dir.Key == ConsoleKey.UpArrow || dir.Key == ConsoleKey.DownArrow || dir.Key == ConsoleKey.LeftArrow || dir.Key == ConsoleKey.RightArrow)
                 {
                     if (LengthCheck(dir, skeppLängd, xC, yC) == true)           // denna if satsen ligger här och inte i den ovan då jag vill kunna vara mer specifik om vad som var fel
@@ -155,11 +160,11 @@ namespace NovemberprojektVincentLönnbroTE17C
                 }
             }
 
-            xCordAll.Add(1, xCord);
-            yCordAll.Add(1, yCord);
+            xCordAll.Add(skeppNr, xCord);
+            yCordAll.Add(skeppNr, yCord);
             Console.WriteLine();
-            
-            
+
+
         }
 
         static bool LengthCheck(ConsoleKeyInfo dir, int skeppLängd, int xC, int yC)
@@ -197,7 +202,7 @@ namespace NovemberprojektVincentLönnbroTE17C
                     return true;
                 }
             }
-            else 
+            else
             {
                 if (xC + skeppLängd < 0)
                 {
@@ -222,14 +227,39 @@ namespace NovemberprojektVincentLönnbroTE17C
             return defDic;
         }
 
-        static Dictionary<int, Dictionary<int, string>> ShipPutter(Dictionary<int, Dictionary<int, string>> fullDic, Dictionary<int, string> dicO, Dictionary<int, string> dic)
+        static bool CordsChecker(int skeppNr, int nr)
+        {
+            if (xCordAll[skeppNr].Contains(nr))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        static Dictionary<int, Dictionary<int, string>> DefaultMap1(Dictionary<int, Dictionary<int, string>> fullDic, Dictionary<int, string> dicO)
+        {
+            for (int i = 0; i < dicO.Count; i++)
+            {
+                fullDic[i] = dicO;
+            }
+            return fullDic;
+        }
+
+        static void ShipPutter(Dictionary<int, Dictionary<int, string>> fullDic, Dictionary<int, string> dicO, Dictionary<int, string> dic, int skeppNr)
         {
             for (int i = 0; i < dicO.Count; i++)
             {
 
                 for (int j = 0; j < dicO.Count; j++)
                 {
-                    if (xCordAll[1].Contains(j))
+                    if (CordsChecker(skeppNr - 1, j))
+                    {
+                        dic[j + 1] = Skepp.Skepp1;
+                    }
+                    else if (CordsChecker(skeppNr, j))
                     {
                         dic[j + 1] = Skepp.Skepp1;
                     }
@@ -239,7 +269,11 @@ namespace NovemberprojektVincentLönnbroTE17C
                     }
 
                 }
-                if (yCordAll[1].Contains(i + 1))
+                if (yCordAll[skeppNr].Contains(i + 1))
+                {
+                    fullDic[i] = dic;
+                }
+                else if (yCordAll[skeppNr - 1].Contains(i + 1))
                 {
                     fullDic[i] = dic;
                 }
@@ -249,8 +283,6 @@ namespace NovemberprojektVincentLönnbroTE17C
                 }
 
             }
-
-            return fullDic;
         }
 
         static void test2(Dictionary<int, Dictionary<int, string>> testDic)
